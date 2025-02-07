@@ -42,8 +42,10 @@ public class SecurityConfig {
                 })
             )
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/auth/register", "/api/auth/login").permitAll()
-                .anyRequest().authenticated()
+            .requestMatchers("/api/auth/**").permitAll() // Allow public auth APIs
+            .requestMatchers("/api/users/**").authenticated() // Require authentication for user APIs
+            .requestMatchers("/api/blogs").authenticated() // Require authentication for blogs
+            .requestMatchers("/api/blogs/**").authenticated() // Require authentication for blogs
             )
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authenticationProvider(authenticationProvider())

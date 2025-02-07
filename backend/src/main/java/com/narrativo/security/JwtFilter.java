@@ -37,27 +37,37 @@ public class JwtFilter extends OncePerRequestFilter {
         String authorizationHeader = request.getHeader("Authorization");
 
         if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
+            System.out.println("🔴 No JWT token found in request headers.");
             filterChain.doFilter(request, response);
             return;
         }
 
         try {
             String token = authorizationHeader.substring(7);
+            System.out.println("🟢 Extracted JWT Token: " + token);
+            
             String username = jwtUtil.extractUsername(token);
 
             if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                 UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
-                if (jwtUtil.validateToken(token, username)) {
+                if (jwtUtil.validateToken(token, userDetails)) {
                     UsernamePasswordAuthenticationToken authenticationToken =
                             new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                     authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                     SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+                    System.out.println("🔒 SecurityContextHolder set: " + SecurityContextHolder.getContext().getAuthentication());
+                    // Verify the authentication is retained after filter execution
+                    filterChain.doFilter(request, response);
+
+                    System.out.println("🔄 After filter chain execution, Authentication: " + SecurityContextHolder.getContext().getAuthentication());
+                } else {
+                    System.out.println("🔴 Invalid JWT Token");
                 }
             }
         } catch (Exception e) {
-            // Log the error but don't throw it
-            logger.error("Cannot set user authentication: {}", e);
+            e.printStackTrace(); // Debugging
+            System.out.println("🔴 Error setting authentication: " + e.getMessage());
         }
         
         filterChain.doFilter(request, response);

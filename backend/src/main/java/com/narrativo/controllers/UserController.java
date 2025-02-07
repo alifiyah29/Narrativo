@@ -1,17 +1,17 @@
 package com.narrativo.controllers;
 
 import com.narrativo.models.User;
-import com.narrativo.payloads.RegisterRequest;
 import com.narrativo.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/auth")  // Updated to /api/auth for consistency with security config
+@RequestMapping("/api/users")
 public class UserController {
 
     private final UserService userService;
@@ -21,17 +21,15 @@ public class UserController {
         this.userService = userService;
     }
 
-    // Registration endpoint for user signup
-    @PostMapping("/register")
-    public ResponseEntity<Map<String, String>> register(@RequestBody RegisterRequest request) {
-        User user = new User();
-        user.setUsername(request.getUsername());
-        user.setPassword(request.getPassword());
-        user.setRole("USER"); // Assign default role
-        userService.createUser(user); 
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getUserById(@PathVariable Long id) {
+        Optional<User> user = userService.getUserById(id);
 
-        Map<String, String> response = new HashMap<>();
-        response.put("message", "User registered successfully");
-        return ResponseEntity.ok(response);
+        if (user.isPresent()) {
+            return ResponseEntity.ok(user.get());
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("error", "User not found"));
+        }
     }
 }
