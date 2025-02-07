@@ -2,16 +2,17 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, tap } from 'rxjs';
 import { LoginRequest, RegisterRequest, AuthResponse } from '../models/auth.model';
+import { Router } from '@angular/router';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  private readonly API_URL = 'http://localhost:8080/api/auth';
+  private readonly API_URL = 'http://localhost:8080/api/auth'; // Backend URL
   private isAuthenticatedSubject = new BehaviorSubject<boolean>(false);
   isAuthenticated$ = this.isAuthenticatedSubject.asObservable();
 
-  constructor(private http: HttpClient) {
+  constructor(private http: HttpClient, private router: Router) {
     this.checkToken();
   }
 
@@ -23,7 +24,7 @@ export class AuthService {
     return this.http.post<AuthResponse>(`${this.API_URL}/login`, request)
       .pipe(
         tap(response => {
-          localStorage.setItem('token', response.token);
+          this.storeToken(response.token);
           this.isAuthenticatedSubject.next(true);
         })
       );
@@ -32,14 +33,23 @@ export class AuthService {
   logout(): void {
     localStorage.removeItem('token');
     this.isAuthenticatedSubject.next(false);
+    this.router.navigate(['/login']);
   }
 
   private checkToken(): void {
-    const token = localStorage.getItem('token');
+    const token = this.getToken();
     this.isAuthenticatedSubject.next(!!token);
+  }
+
+  storeToken(token: string): void {
+    localStorage.setItem('token', token);
   }
 
   getToken(): string | null {
     return localStorage.getItem('token');
+  }
+
+  isAuthenticated(): boolean {
+    return !!this.getToken();
   }
 }
