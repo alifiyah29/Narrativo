@@ -38,6 +38,7 @@ public class BlogServiceImpl implements BlogService {
 
     @Override
     public List<Blog> getAllBlogs() {
+        System.out.println("Fetching all blogs..."); //Debugging
         return blogRepository.findAll();
     }
 

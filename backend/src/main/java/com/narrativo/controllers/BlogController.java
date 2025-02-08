@@ -22,121 +22,123 @@ public class BlogController {
 
     private final BlogService blogService;
 
+    // Create a new blog
     @PostMapping
     public ResponseEntity<Blog> createBlog(@AuthenticationPrincipal UserDetails userDetails, @RequestBody Blog blog) {
-        Blog savedBlog = blogService.createBlog(blog, userDetails.getUsername());
-        return ResponseEntity.ok(savedBlog);
+        try {
+            Blog savedBlog = blogService.createBlog(blog, userDetails.getUsername());
+            return ResponseEntity.status(HttpStatus.CREATED).body(savedBlog);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
     }
 
+    // Get all blogs
     @GetMapping
     public ResponseEntity<List<Blog>> getAllBlogs() {
-        return ResponseEntity.ok(blogService.getAllBlogs());
+        try {
+            List<Blog> blogs = blogService.getAllBlogs();
+            System.out.println("Returning blogs: " + blogs.size()); // Debug
+            return ResponseEntity.ok(blogs); // Ensure only one response is returned
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
+    // Get a blog by ID
     @GetMapping("/{id}")
     public ResponseEntity<Blog> getBlogById(@PathVariable Long id) {
         Optional<Blog> blog = blogService.getBlogById(id);
         return blog.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
+    // Get blogs by author
     @GetMapping("/user/{authorId}")
     public ResponseEntity<List<Blog>> getBlogsByAuthor(@PathVariable Long authorId) {
-        return ResponseEntity.ok(blogService.getBlogsByAuthor(authorId));
+        try {
+            List<Blog> blogs = blogService.getBlogsByAuthor(authorId);
+            return ResponseEntity.ok(blogs);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
+    // Get blogs by visibility
     @GetMapping("/visibility/{visibility}")
     public ResponseEntity<List<Blog>> getBlogsByVisibility(@PathVariable Blog.Visibility visibility) {
-        return ResponseEntity.ok(blogService.getBlogsByVisibility(visibility));
+        try {
+            List<Blog> blogs = blogService.getBlogsByVisibility(visibility);
+            return ResponseEntity.ok(blogs);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
-@PutMapping("/{id}")
+    // Update a blog
+    @PutMapping("/{id}")
     public ResponseEntity<?> updateBlog(
             @AuthenticationPrincipal UserDetails userDetails,
             @PathVariable Long id,
             @RequestBody Blog updatedBlog) {
-        
+
+        Optional<Blog> existingBlog = blogService.getBlogById(id);
+        if (existingBlog.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(createMessage("Blog not found with id: " + id));
+        }
+
+        Blog blog = existingBlog.get();
+        if (!blog.getAuthor().getUsername().equals(userDetails.getUsername())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(createMessage("You don't have permission to update this blog"));
+        }
+
         try {
-            // First, check if the blog exists
-            Optional<Blog> existingBlog = blogService.getBlogById(id);
-            
-            if (existingBlog.isEmpty()) {
-                return ResponseEntity
-                    .status(HttpStatus.NOT_FOUND)
-                    .body(new HashMap<String, String>() {{
-                        put("message", "Blog not found with id: " + id);
-                    }});
-            }
-            
-            // Check if the current user is the author
-            Blog blog = existingBlog.get();
-            if (!blog.getAuthor().getUsername().equals(userDetails.getUsername())) {
-                return ResponseEntity
-                    .status(HttpStatus.FORBIDDEN)
-                    .body(new HashMap<String, String>() {{
-                        put("message", "You don't have permission to update this blog");
-                    }});
-            }
-            
-            // Update only the allowed fields
+            // Update allowed fields
             blog.setTitle(updatedBlog.getTitle());
             blog.setContent(updatedBlog.getContent());
             blog.setVisibility(updatedBlog.getVisibility());
             blog.setUpdatedAt(LocalDateTime.now());
-            
-            // Save the updated blog
-            Blog saved = blogService.updateBlog(blog);
-            return ResponseEntity.ok(saved);
-            
+
+            Blog savedBlog = blogService.updateBlog(blog);
+            return ResponseEntity.ok(savedBlog);
         } catch (Exception e) {
-            return ResponseEntity
-                .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(new HashMap<String, String>() {{
-                    put("message", "Error updating blog: " + e.getMessage());
-                }});
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(createMessage("Error updating blog: " + e.getMessage()));
         }
     }
 
+    // Delete a blog
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteBlog(
             @AuthenticationPrincipal UserDetails userDetails,
             @PathVariable Long id) {
-        
-        try {
-            // Check if the blog exists
-            Optional<Blog> existingBlog = blogService.getBlogById(id);
-            
-            if (existingBlog.isEmpty()) {
-                return ResponseEntity
-                    .status(HttpStatus.NOT_FOUND)
-                    .body(new HashMap<String, String>() {{
-                        put("message", "Blog not found with id: " + id);
-                    }});
-            }
-            
-            // Check if the current user is the author
-            Blog blog = existingBlog.get();
-            if (!blog.getAuthor().getUsername().equals(userDetails.getUsername())) {
-                return ResponseEntity
-                    .status(HttpStatus.FORBIDDEN)
-                    .body(new HashMap<String, String>() {{
-                        put("message", "You don't have permission to delete this blog");
-                    }});
-            }
-            
-            // Delete the blog
-            blogService.deleteBlog(id);
-            return ResponseEntity
-                .ok()
-                .body(new HashMap<String, String>() {{
-                    put("message", "Blog successfully deleted");
-                }});
-                
-        } catch (Exception e) {
-            return ResponseEntity
-                .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(new HashMap<String, String>() {{
-                    put("message", "Error deleting blog: " + e.getMessage());
-                }});
+
+        Optional<Blog> existingBlog = blogService.getBlogById(id);
+        if (existingBlog.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(createMessage("Blog not found with id: " + id));
         }
+
+        Blog blog = existingBlog.get();
+        if (!blog.getAuthor().getUsername().equals(userDetails.getUsername())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(createMessage("You don't have permission to delete this blog"));
+        }
+
+        try {
+            blogService.deleteBlog(id);
+            return ResponseEntity.ok(createMessage("Blog successfully deleted"));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(createMessage("Error deleting blog: " + e.getMessage()));
+        }
+    }
+
+    // Helper method to create a response message
+    private HashMap<String, String> createMessage(String message) {
+        HashMap<String, String> response = new HashMap<>();
+        response.put("message", message);
+        return response;
     }
 }
