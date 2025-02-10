@@ -40,3 +40,12 @@ testem.log
 # System files
 .DS_Store
 Thumbs.db
+
+
+extensions.json
+launch.json
+settings.json
+tasks.json
+favicon.ico
+.editorconfig
+tsconfig.spec.json

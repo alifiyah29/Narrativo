@@ -31,3 +31,8 @@ build/
 
 ### VS Code ###
 .vscode/
+
+maven-wrapper.properties
+BackendApplicationTests.java
+mvnw
+mvnw.cmd
