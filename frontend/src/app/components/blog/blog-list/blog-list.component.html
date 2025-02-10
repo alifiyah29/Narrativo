@@ -1,53 +1,56 @@
-<div class="max-w-7xl mx-auto p-6">
-    <div class="flex justify-between items-center mb-6">
-      <h2 class="text-2xl font-bold">Blogs</h2>
-      <button
-        routerLink="/blogs/new"
-        class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700"
-      >
-        Create New Blog
+<div class="blog-container">
+  <mat-toolbar color="primary" class="toolbar">
+    <div class="toolbar-left">
+      <span>{{ username || "Guest" }}'s Blogs</span>
+    </div>
+    <div class="toolbar-right">
+      <button mat-raised-button color="accent" routerLink="/blogs/new">
+        <mat-icon>add</mat-icon>
+        Create Blog
       </button>
-    </div>
-  
-    <div class="mb-6">
-      <div class="flex space-x-4">
-        <button
-          *ngFor="let filter of visibilityFilters"
-          (click)="onVisibilityFilterChange(filter)"
-          [class.bg-indigo-600]="currentVisibilityFilter === filter"
-          [class.text-white]="currentVisibilityFilter === filter"
-          [class.bg-gray-200]="currentVisibilityFilter !== filter"
-          class="px-4 py-2 rounded-md text-sm font-medium"
-        >
-          {{ filter }}
+      <button mat-icon-button [matMenuTriggerFor]="filterMenu" class="ml-4">
+        <mat-icon>filter_list</mat-icon>
+      </button>
+      <mat-menu #filterMenu="matMenu">
+        <button mat-menu-item (click)="onVisibilityFilterChange('ALL')">
+          All Blogs
         </button>
-      </div>
+        <button mat-menu-item (click)="onVisibilityFilterChange('PUBLIC')">
+          Public Blogs
+        </button>
+        <button mat-menu-item (click)="onVisibilityFilterChange('PRIVATE')">
+          Private Blogs
+        </button>
+      </mat-menu>
     </div>
-  
-    <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-      <div *ngFor="let blog of blogs" class="bg-white rounded-lg shadow-md p-6">
-        <h3 class="text-xl font-semibold mb-2">{{ blog.title }}</h3>
-        <p class="text-gray-600 mb-4 line-clamp-3">{{ blog.content }}</p>
-  
-        <div class="flex justify-between items-center">
-          <span class="text-sm text-gray-500">
-            {{ blog.createdAt | date }}
-          </span>
-          <div class="space-x-2">
-            <button
-              [routerLink]="['/blogs', blog.id, 'edit']"
-              class="text-indigo-600 hover:text-indigo-800"
-            >
-              Edit
+  </mat-toolbar>
+
+  <div class="main-content">
+    <mat-spinner *ngIf="isLoading" class="loading-spinner"></mat-spinner>
+
+    <div class="blog-grid" *ngIf="!isLoading">
+      <div *ngIf="blogs.length === 0" class="no-blogs-message">
+        No blogs found. Create your first blog!
+      </div>
+
+      <div *ngFor="let blog of blogs; trackBy: trackByBlogId" class="blog-card">
+        <div class="blog-card-header">
+          <h3>{{ blog.title }}</h3>
+          <div class="blog-actions">
+            <button mat-icon-button [routerLink]="['/blogs', blog.id, 'edit']">
+              <mat-icon>edit</mat-icon>
             </button>
-            <button
-              (click)="deleteBlog(blog.id)"
-              class="text-red-600 hover:text-red-800"
-            >
-              Delete
+            <button mat-icon-button (click)="deleteBlog(blog.id)">
+              <mat-icon>delete</mat-icon>
             </button>
           </div>
+        </div>
+        <p class="blog-content">{{ blog.content }}</p>
+        <div class="blog-footer">
+          <span class="blog-date">{{ blog.createdAt | date }}</span>
+          <span class="blog-visibility">{{ blog.visibility }}</span>
         </div>
       </div>
     </div>
   </div>
+</div>

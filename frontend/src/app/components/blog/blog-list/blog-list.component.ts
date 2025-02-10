@@ -1,44 +1,64 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
+import { MatMenuModule } from '@angular/material/menu';
+import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { BlogService } from '../../../services/blog/blog.service';
+import { AuthService } from '../../../services/auth/auth.service';
 import { Blog } from '../../../models/blog/blog.model';
 
 @Component({
   selector: 'app-blog-list',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [
+    CommonModule,
+    RouterModule,
+    MatIconModule,
+    MatButtonModule,
+    MatMenuModule,
+    MatToolbarModule,
+    MatProgressSpinnerModule
+  ],
   templateUrl: './blog-list.component.html',
+  styleUrls: ['./blog-list.component.css'],
 })
 export class BlogListComponent implements OnInit {
   blogs: Blog[] = [];
-  visibilityFilters: ('ALL' | 'PUBLIC' | 'PRIVATE')[] = [
-    'ALL',
-    'PUBLIC',
-    'PRIVATE',
-  ];
   currentVisibilityFilter: 'ALL' | 'PUBLIC' | 'PRIVATE' = 'ALL';
+  isLoading: boolean = true;
+  username: string = '';
 
-  constructor(private blogService: BlogService) {}
+  constructor(
+    private blogService: BlogService,
+    private authService: AuthService
+  ) {}
 
   ngOnInit() {
+    const currentUser = this.authService.getCurrentUser();
+    console.log('Current User:', currentUser);
+    this.username = currentUser ? currentUser.username : 'Guest';
     this.loadBlogs();
   }
 
   loadBlogs() {
-    if (this.currentVisibilityFilter === 'ALL') {
-      this.blogService.getAllBlogs().subscribe({
-        next: (blogs) => (this.blogs = blogs),
-        error: (error) => console.error('Error loading blogs:', error),
-      });
-    } else {
-      this.blogService
-        .getBlogsByVisibility(this.currentVisibilityFilter)
-        .subscribe({
-          next: (blogs) => (this.blogs = blogs),
-          error: (error) => console.error('Error loading blogs:', error),
-        });
-    }
+    this.isLoading = true;
+    const request = this.currentVisibilityFilter === 'ALL' 
+      ? this.blogService.getAllBlogs() 
+      : this.blogService.getBlogsByVisibility(this.currentVisibilityFilter);
+
+    request.subscribe({
+      next: (blogs) => {
+        this.blogs = blogs;
+        this.isLoading = false;
+      },
+      error: (error) => {
+        console.error('Error loading blogs:', error);
+        this.isLoading = false;
+      }
+    });
   }
 
   onVisibilityFilterChange(visibility: 'ALL' | 'PUBLIC' | 'PRIVATE') {
@@ -47,7 +67,7 @@ export class BlogListComponent implements OnInit {
   }
 
   deleteBlog(id: number) {
-    if (confirm('Are you sure you want to delete this blog?')) {
+    if (confirm('Delete this blog?')) {
       this.blogService.deleteBlog(id).subscribe({
         next: () => {
           this.blogs = this.blogs.filter((blog) => blog.id !== id);
@@ -55,5 +75,9 @@ export class BlogListComponent implements OnInit {
         error: (error) => console.error('Error deleting blog:', error),
       });
     }
+  }
+
+  trackByBlogId(index: number, blog: Blog): number {
+    return blog.id;
   }
 }

@@ -10,11 +10,17 @@ import {
   AuthResponse,
 } from '../../models/auth/auth.model';
 
+interface DecodedToken extends JwtPayload {
+  userId: number;
+  username: string;
+  email: string;
+}
+
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
-  private readonly API_URL = 'http://localhost:8080/api/auth'; // Backend URL
+  private readonly API_URL = 'http://localhost:8080/api/auth';
   private isAuthenticatedSubject = new BehaviorSubject<boolean>(false);
   isAuthenticated$ = this.isAuthenticatedSubject.asObservable();
 
@@ -49,7 +55,7 @@ export class AuthService {
     this.isAuthenticatedSubject.next(false);
     this.router.navigate(['/login']).catch((error) => {
       console.error('Logout redirection failed:', error);
-      window.location.href = '/login'; // Fallback
+      window.location.href = '/login';
     });
   }
 
@@ -68,12 +74,12 @@ export class AuthService {
 
   private isTokenExpired(token: string): boolean {
     try {
-      const decoded = jwtDecode<JwtPayload>(token);
-      const currentTime = Math.floor(Date.now() / 1000); // Current time in seconds
+      const decoded = jwtDecode<DecodedToken>(token);
+      const currentTime = Math.floor(Date.now() / 1000);
       return decoded.exp ? decoded.exp < currentTime : true;
     } catch (error) {
       console.error('Error decoding token:', error);
-      return true; // Treat invalid tokens as expired
+      return true;
     }
   }
 
@@ -88,5 +94,34 @@ export class AuthService {
   isAuthenticated(): boolean {
     const token = this.getToken();
     return token ? !this.isTokenExpired(token) : false;
+  }
+
+  // New methods to retrieve user information
+  getCurrentUser(): { userId: number, username: string, email: string } | null {
+    const token = this.getToken();
+    if (token) {
+      try {
+        const decoded = jwtDecode<DecodedToken>(token);
+        return {
+          userId: decoded.userId,
+          username: decoded.username,
+          email: decoded.email
+        };
+      } catch (error) {
+        console.error('Error decoding token:', error);
+        return null;
+      }
+    }
+    return null;
+  }
+
+  getCurrentUsername(): string {
+    const user = this.getCurrentUser();
+    return user ? user.username : 'Guest';
+  }
+
+  getCurrentUserId(): number | null {
+    const user = this.getCurrentUser();
+    return user ? user.userId : null;
   }
 }
