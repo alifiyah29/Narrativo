@@ -41,6 +41,7 @@ export class AuthService {
     return this.http.post<AuthResponse>(`${this.API_URL}/login`, request).pipe(
       tap((response) => {
         this.storeToken(response.token);
+        localStorage.setItem('user', JSON.stringify(response)); // Store user details
         this.isAuthenticatedSubject.next(true);
       }),
       catchError((error) => {
@@ -97,22 +98,9 @@ export class AuthService {
   }
 
   // New methods to retrieve user information
-  getCurrentUser(): { userId: number, username: string, email: string } | null {
-    const token = this.getToken();
-    if (token) {
-      try {
-        const decoded = jwtDecode<DecodedToken>(token);
-        return {
-          userId: decoded.userId,
-          username: decoded.username,
-          email: decoded.email
-        };
-      } catch (error) {
-        console.error('Error decoding token:', error);
-        return null;
-      }
-    }
-    return null;
+  getCurrentUser(): { userId: number; username: string; email: string } | null {
+    const user = localStorage.getItem('user');
+    return user ? JSON.parse(user) : null;
   }
 
   getCurrentUsername(): string {

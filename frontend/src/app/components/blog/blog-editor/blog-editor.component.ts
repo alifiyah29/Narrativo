@@ -1,6 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import {
+  FormBuilder,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 import { BlogService } from '../../../services/blog/blog.service';
 import { ActivatedRoute, Router } from '@angular/router';
 
@@ -8,7 +13,7 @@ import { ActivatedRoute, Router } from '@angular/router';
   selector: 'app-blog-editor',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
-  templateUrl: './blog-editor.component.html'
+  templateUrl: './blog-editor.component.html',
 })
 export class BlogEditorComponent implements OnInit {
   blogForm: FormGroup;
@@ -24,7 +29,7 @@ export class BlogEditorComponent implements OnInit {
     this.blogForm = this.fb.group({
       title: ['', Validators.required],
       content: ['', Validators.required],
-      visibility: ['PUBLIC', Validators.required]
+      visibility: ['PUBLIC', Validators.required],
     });
   }
 
@@ -57,21 +62,20 @@ export class BlogEditorComponent implements OnInit {
       });
     }
   }
-  
 
   onSubmit() {
     if (this.blogForm.valid) {
       const blogData = this.blogForm.value;
-      
+
       const request$ = this.isEditing
         ? this.blogService.updateBlog(this.blogId!, blogData)
         : this.blogService.createBlog(blogData);
 
       request$.subscribe({
         next: () => {
-          this.router.navigate(['/dashboard']);
+          this.router.navigate(['/blogs']);
         },
-        error: (error) => console.error('Error saving blog:', error)
+        error: (error) => console.error('Error saving blog:', error),
       });
     }
   }
