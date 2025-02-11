@@ -1,11 +1,11 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
-import { 
-  MatCardModule, 
-  MatCardContent, 
-  MatCardHeader, 
-  MatCardTitle 
+import {
+  MatCardModule,
+  MatCardContent,
+  MatCardHeader,
+  MatCardTitle,
 } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
@@ -14,7 +14,10 @@ import { MatButtonModule } from '@angular/material/button';
 
 import { AnalyticsService } from '../../services/analytics/analytics.service';
 import { AuthService } from '../../services/auth/auth.service';
-import { UserAnalytics, AdminAnalytics } from '../../models/analytics/analytics.model';
+import {
+  UserAnalytics,
+  AdminAnalytics,
+} from '../../models/analytics/analytics.model';
 import { MatToolbar } from '@angular/material/toolbar';
 
 @Component({
@@ -31,10 +34,10 @@ import { MatToolbar } from '@angular/material/toolbar';
     MatListModule,
     MatProgressSpinnerModule,
     MatButtonModule,
-    MatToolbar
+    MatToolbar,
   ],
   templateUrl: './dashboard.component.html',
-  styleUrls: ['./dashboard.component.css']
+  styleUrls: ['./dashboard.component.css'],
 })
 export class DashboardComponent implements OnInit {
   userAnalytics: UserAnalytics | null = null;
@@ -47,11 +50,11 @@ export class DashboardComponent implements OnInit {
   private router = inject(Router);
 
   ngOnInit(): void {
-    const currentUser = this.authService.getCurrentUser();
-    this.isAdmin = currentUser?.role === 'ADMIN';
+    const role = this.authService.getCurrentUserRole(); // Get role from token
+    this.isAdmin = role === 'ADMIN'; // Check if the user is an admin
 
     this.loadUserAnalytics();
-    
+
     if (this.isAdmin) {
       this.loadAdminAnalytics();
     }
@@ -65,7 +68,7 @@ export class DashboardComponent implements OnInit {
       error: (error) => {
         console.error('Failed to load user analytics:', error);
         this.handleError(error);
-      }
+      },
     });
   }
 
@@ -77,7 +80,7 @@ export class DashboardComponent implements OnInit {
       error: (error) => {
         console.error('Failed to load admin analytics:', error);
         this.errorMessage = 'Failed to load admin statistics';
-      }
+      },
     });
   }
 

@@ -13,7 +13,7 @@ import {
 interface DecodedToken extends JwtPayload {
   userId: number;
   username: string;
-  email: string;
+  role: string;
 }
 
 @Injectable({
@@ -107,13 +107,17 @@ export class AuthService {
     return user ? JSON.parse(user) : null;
   }
 
-  getCurrentUsername(): string {
-    const user = this.getCurrentUser();
-    return user ? user.username : 'Guest';
-  }
-
-  getCurrentUserId(): number | null {
-    const user = this.getCurrentUser();
-    return user ? user.userId : null;
+  getCurrentUserRole(): string | null {
+    const token = this.getToken();
+    if (token) {
+      try {
+        const decoded = jwtDecode<DecodedToken>(token);
+        return decoded.role;
+      } catch (error) {
+        console.error('Error decoding token:', error);
+        return null;
+      }
+    }
+    return null;
   }
 }
