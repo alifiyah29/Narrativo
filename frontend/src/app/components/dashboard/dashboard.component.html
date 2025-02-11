@@ -49,7 +49,7 @@
               <mat-icon class="stat-icon">schedule</mat-icon>
               <div class="stat-text">
                 <h3>Last Login</h3>
-                <p>{{ userAnalytics.lastLogin | date:'medium' }}</p>
+                <p>{{ userAnalytics.lastLogin | date : "medium" }}</p>
               </div>
             </div>
           </mat-card-content>
@@ -107,14 +107,21 @@
         </mat-card-header>
         <mat-card-content>
           <mat-list>
-            <mat-list-item *ngFor="let blog of adminAnalytics.recentActivity" 
-                         class="activity-item">
+            <mat-list-item
+              *ngFor="let blog of adminAnalytics.recentActivity"
+              class="activity-item"
+            >
               <div class="activity-content">
                 <h3 class="blog-title">{{ blog.title }}</h3>
                 <div class="blog-meta">
                   <span class="author">{{ blog.author.username }}</span>
-                  <span class="date">{{ blog.createdAt | date:'mediumDate' }}</span>
-                  <span class="visibility" [ngClass]="blog.visibility.toLowerCase()">
+                  <span class="date">{{
+                    blog.createdAt | date : "mediumDate"
+                  }}</span>
+                  <span
+                    class="visibility"
+                    [ngClass]="blog.visibility.toLowerCase()"
+                  >
                     {{ blog.visibility }}
                   </span>
                 </div>
@@ -127,5 +134,21 @@
 
     <!-- Loading State -->
     <mat-spinner *ngIf="!userAnalytics" class="loading-spinner"></mat-spinner>
+  </div>
+
+  <div *ngIf="isAdmin && monthlyBlogTrends.length > 0" class="chart-section">
+    <h2 class="section-title">Monthly Blog Trends</h2>
+    <ngx-charts-bar-vertical
+      [view]="[1000, 400]"
+      [results]="monthlyBlogTrends"
+      [xAxis]="true"
+      [yAxis]="true"
+      [legend]="true"
+      [showXAxisLabel]="true"
+      [showYAxisLabel]="true"
+      xAxisLabel="Month"
+      yAxisLabel="Number of Blogs"
+    >
+    </ngx-charts-bar-vertical>
   </div>
 </div>

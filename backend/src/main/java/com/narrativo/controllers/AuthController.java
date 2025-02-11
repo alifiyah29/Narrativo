@@ -70,32 +70,32 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginRequest request) {
-        try {
-            Authentication authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())
-            );
+public ResponseEntity<?> login(@RequestBody LoginRequest request) {
+    try {
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())
+        );
 
-            // Update last login time
-            User user = userRepository.findByUsername(request.getUsername());
-            if (user != null) {
-                user.setLastLogin(LocalDateTime.now());
-                userRepository.save(user);
-            }
-
-            String token = jwtUtil.generateToken((UserDetails) authentication.getPrincipal()); // Pass UserDetails
-            Map<String, String> response = new HashMap<>();
-            response.put("token", token);
-            response.put("username", authentication.getName());
-            response.put("role", user.getRole().name()); // Include role in the response
-            return ResponseEntity.ok(response);
-
-        } catch (BadCredentialsException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Map.of("error", "Invalid username or password"));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("error", "Authentication failed: " + e.getMessage()));
+        // Update last login time
+        User user = userRepository.findByUsername(request.getUsername());
+        if (user != null) {
+            user.setLastLogin(LocalDateTime.now());
+            userRepository.save(user);
         }
+
+        String token = jwtUtil.generateToken((UserDetails) authentication.getPrincipal()); // Pass UserDetails
+        Map<String, String> response = new HashMap<>();
+        response.put("token", token);
+        response.put("username", authentication.getName());
+        response.put("role", user.getRole().name()); // Include role in the response
+        return ResponseEntity.ok(response);
+
+    } catch (BadCredentialsException e) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(Map.of("error", "Invalid username or password"));
+    } catch (Exception e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(Map.of("error", "Authentication failed: " + e.getMessage()));
     }
+}
 }

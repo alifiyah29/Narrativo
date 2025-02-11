@@ -11,6 +11,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatButtonModule } from '@angular/material/button';
+import { NgxChartsModule } from '@swimlane/ngx-charts';
 
 import { AnalyticsService } from '../../services/analytics/analytics.service';
 import { AuthService } from '../../services/auth/auth.service';
@@ -34,6 +35,7 @@ import { MatToolbar } from '@angular/material/toolbar';
     MatListModule,
     MatProgressSpinnerModule,
     MatButtonModule,
+    NgxChartsModule, // Add NgxChartsModule
     MatToolbar,
   ],
   templateUrl: './dashboard.component.html',
@@ -45,18 +47,22 @@ export class DashboardComponent implements OnInit {
   isAdmin = false;
   errorMessage: string | null = null;
 
+  // Chart data
+  monthlyBlogTrends: any[] = [];
+
   private analyticsService = inject(AnalyticsService);
   private authService = inject(AuthService);
   private router = inject(Router);
 
   ngOnInit(): void {
-    const role = this.authService.getCurrentUserRole(); // Get role from token
-    this.isAdmin = role === 'ADMIN'; // Check if the user is an admin
+    const role = this.authService.getCurrentUserRole();
+    this.isAdmin = role === 'ADMIN';
 
     this.loadUserAnalytics();
 
     if (this.isAdmin) {
       this.loadAdminAnalytics();
+      this.loadMonthlyBlogTrends();
     }
   }
 
@@ -80,6 +86,17 @@ export class DashboardComponent implements OnInit {
       error: (error) => {
         console.error('Failed to load admin analytics:', error);
         this.errorMessage = 'Failed to load admin statistics';
+      },
+    });
+  }
+
+  private loadMonthlyBlogTrends(): void {
+    this.analyticsService.getMonthlyBlogTrends().subscribe({
+      next: (data) => {
+        this.monthlyBlogTrends = data;
+      },
+      error: (error) => {
+        console.error('Failed to load monthly blog trends:', error);
       },
     });
   }
