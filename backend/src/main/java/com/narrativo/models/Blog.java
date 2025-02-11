@@ -18,6 +18,9 @@ public class Blog {
     @Column(columnDefinition = "TEXT", nullable = false)
     private String content;
 
+    @Column(nullable = false)
+    private Integer views = 0;
+
     @ManyToOne
     @JoinColumn(name = "author_id", nullable = false)
     private User author;

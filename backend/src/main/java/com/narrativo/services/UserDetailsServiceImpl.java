@@ -22,7 +22,7 @@ public class UserDetailsServiceImpl implements org.springframework.security.core
         return org.springframework.security.core.userdetails.User.builder()
                 .username(user.getUsername())
                 .password(user.getPassword())
-                .authorities("ROLE_" + user.getRole()) // Fix: Convert role to authority
+                .authorities("ROLE_" + user.getRole().name()) 
                 .build();
     }
 

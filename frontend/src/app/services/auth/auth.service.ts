@@ -97,8 +97,12 @@ export class AuthService {
     return token ? !this.isTokenExpired(token) : false;
   }
 
-  // New methods to retrieve user information
-  getCurrentUser(): { userId: number; username: string; email: string } | null {
+  getCurrentUser(): {
+    userId: number;
+    username: string;
+    email: string;
+    role: string;
+  } | null {
     const user = localStorage.getItem('user');
     return user ? JSON.parse(user) : null;
   }
