@@ -15,10 +15,16 @@
         <button mat-menu-item (click)="onVisibilityFilterChange('ALL')">
           All Blogs
         </button>
-        <button mat-menu-item (click)="onVisibilityFilterChange('PUBLIC')">
+        <button
+          mat-menu-item
+          (click)="onVisibilityFilterChange(Visibility.PUBLIC)"
+        >
           Public Blogs
         </button>
-        <button mat-menu-item (click)="onVisibilityFilterChange('PRIVATE')">
+        <button
+          mat-menu-item
+          (click)="onVisibilityFilterChange(Visibility.PRIVATE)"
+        >
           Private Blogs
         </button>
       </mat-menu>
@@ -27,13 +33,12 @@
 
   <div class="main-content">
     <mat-spinner *ngIf="isLoading" class="loading-spinner"></mat-spinner>
-
     <div class="blog-grid" *ngIf="!isLoading">
-      <div *ngIf="blogs.length === 0" class="no-blogs-message">
-        No blogs found. Create your first blog!
-      </div>
-
-      <div *ngFor="let blog of blogs; trackBy: trackByBlogId" class="blog-card">
+      <div
+        *ngFor="let blog of blogs; trackBy: trackByBlogId"
+        class="blog-card"
+        (click)="viewBlog(blog.id)"
+      >
         <div class="blog-card-header">
           <h3>{{ blog.title }}</h3>
           <div class="blog-actions">
@@ -48,7 +53,7 @@
         <p class="blog-content">{{ blog.content }}</p>
         <div class="blog-footer">
           <span class="blog-date">{{ blog.createdAt | date }}</span>
-          <!-- <span class="blog-visibility">{{ blog.visibility }}</span> -->
+          <span class="blog-views">Views: {{ blog.views }}</span>
         </div>
       </div>
     </div>

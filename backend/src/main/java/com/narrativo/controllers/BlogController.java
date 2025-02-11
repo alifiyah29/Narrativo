@@ -74,6 +74,14 @@ public class BlogController {
         }
     }
 
+    
+    //increment the views of a blog
+    @PutMapping("/{id}/view")
+    public ResponseEntity<Blog> incrementViews(@PathVariable Long id) {
+        Blog blog = blogService.incrementViews(id);
+        return ResponseEntity.ok(blog);
+    }    
+
     // Update a blog
     @PutMapping("/{id}")
     public ResponseEntity<?> updateBlog(

@@ -14,4 +14,5 @@ public interface BlogService {
     Optional<Blog> getBlogById(Long id);
     Blog updateBlog(Blog blog);
     void deleteBlog(Long id);
+    Blog incrementViews(Long id);
 }

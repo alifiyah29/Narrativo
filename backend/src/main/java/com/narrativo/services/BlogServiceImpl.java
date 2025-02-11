@@ -73,4 +73,16 @@ public class BlogServiceImpl implements BlogService {
             throw new RuntimeException("Blog not found with id: " + id);
         }
     }
+
+    @Transactional
+    public Blog incrementViews(Long id) {
+        Optional<Blog> blogOptional = blogRepository.findById(id);
+        if (blogOptional.isPresent()) {
+            Blog blog = blogOptional.get();
+            blog.setViews(blog.getViews() + 1); // Increment views
+            return blogRepository.save(blog);
+        } else {
+            throw new RuntimeException("Blog not found with id: " + id);
+        }
+    }    
 }

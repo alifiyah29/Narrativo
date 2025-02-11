@@ -50,6 +50,12 @@ export class BlogService {
     });
   }
 
+  incrementViews(id: number): Observable<Blog> {
+    return this.http.put<Blog>(`${this.API_URL}/${id}/view`, null, {
+      headers: this.getHeaders(),
+    });
+  }
+
   deleteBlog(id: number): Observable<void> {
     return this.http.delete<void>(`${this.API_URL}/${id}`, {
       headers: this.getHeaders(), // Add headers

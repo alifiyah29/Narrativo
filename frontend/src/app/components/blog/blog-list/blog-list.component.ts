@@ -6,9 +6,10 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+
 import { BlogService } from '../../../services/blog/blog.service';
 import { AuthService } from '../../../services/auth/auth.service';
-import { Blog } from '../../../models/blog/blog.model';
+import { Blog, Visibility } from '../../../models/blog/blog.model';
 
 @Component({
   selector: 'app-blog-list',
@@ -20,16 +21,19 @@ import { Blog } from '../../../models/blog/blog.model';
     MatButtonModule,
     MatMenuModule,
     MatToolbarModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
   ],
   templateUrl: './blog-list.component.html',
   styleUrls: ['./blog-list.component.css'],
 })
 export class BlogListComponent implements OnInit {
   blogs: Blog[] = [];
-  currentVisibilityFilter: 'ALL' | 'PUBLIC' | 'PRIVATE' = 'ALL';
+  currentVisibilityFilter: Visibility | 'ALL' = 'ALL'; // Use enum
   isLoading: boolean = true;
   username: string = '';
+
+  // Expose the Visibility enum to the template
+  Visibility = Visibility;
 
   constructor(
     private blogService: BlogService,
@@ -38,16 +42,16 @@ export class BlogListComponent implements OnInit {
 
   ngOnInit() {
     const currentUser = this.authService.getCurrentUser();
-    console.log('Current User:', currentUser);
     this.username = currentUser ? currentUser.username : 'Guest';
     this.loadBlogs();
   }
 
   loadBlogs() {
     this.isLoading = true;
-    const request = this.currentVisibilityFilter === 'ALL' 
-      ? this.blogService.getAllBlogs() 
-      : this.blogService.getBlogsByVisibility(this.currentVisibilityFilter);
+    const request =
+      this.currentVisibilityFilter === 'ALL'
+        ? this.blogService.getAllBlogs()
+        : this.blogService.getBlogsByVisibility(this.currentVisibilityFilter);
 
     request.subscribe({
       next: (blogs) => {
@@ -57,11 +61,11 @@ export class BlogListComponent implements OnInit {
       error: (error) => {
         console.error('Error loading blogs:', error);
         this.isLoading = false;
-      }
+      },
     });
   }
 
-  onVisibilityFilterChange(visibility: 'ALL' | 'PUBLIC' | 'PRIVATE') {
+  onVisibilityFilterChange(visibility: Visibility | 'ALL') {
     this.currentVisibilityFilter = visibility;
     this.loadBlogs();
   }
@@ -75,6 +79,15 @@ export class BlogListComponent implements OnInit {
         error: (error) => console.error('Error deleting blog:', error),
       });
     }
+  }
+
+  viewBlog(id: number) {
+    this.blogService.incrementViews(id).subscribe({
+      next: (blog) => {
+        console.log('Blog views incremented:', blog.views);
+      },
+      error: (error) => console.error('Error incrementing views:', error),
+    });
   }
 
   trackByBlogId(index: number, blog: Blog): number {
