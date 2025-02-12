@@ -6,6 +6,9 @@ import com.narrativo.payloads.RegisterRequest;
 import com.narrativo.repositories.UserRepository;
 import com.narrativo.security.JwtUtil;
 import com.narrativo.services.UserService;
+
+import jakarta.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -14,6 +17,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.validation.BindingResult;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
@@ -43,11 +47,18 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<Map<String, String>> register(@RequestBody RegisterRequest request) {
+    public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest request, BindingResult result) {
+        if (result.hasErrors()) {
+            Map<String, String> errors = new HashMap<>();
+            result.getFieldErrors().forEach(error -> errors.put(error.getField(), error.getDefaultMessage()));
+            return ResponseEntity.badRequest().body(errors);
+        }
+
         User user = new User();
         user.setUsername(request.getUsername());
+        user.setEmail(request.getEmail());
         user.setPassword(request.getPassword());
-        user.setRole(User.Role.USER); // Assign default role
+        user.setRole(User.Role.USER);
         userService.createUser(user);
 
         Map<String, String> response = new HashMap<>();
@@ -70,32 +81,31 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-public ResponseEntity<?> login(@RequestBody LoginRequest request) {
-    try {
-        Authentication authentication = authenticationManager.authenticate(
+    public ResponseEntity<?> login(@RequestBody LoginRequest request) {
+        try {
+            Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())
-        );
-
-        // Update last login time
-        User user = userRepository.findByUsername(request.getUsername());
-        if (user != null) {
-            user.setLastLogin(LocalDateTime.now());
-            userRepository.save(user);
-        }
-
-        String token = jwtUtil.generateToken((UserDetails) authentication.getPrincipal()); // Pass UserDetails
-        Map<String, String> response = new HashMap<>();
-        response.put("token", token);
-        response.put("username", authentication.getName());
-        response.put("role", user.getRole().name()); // Include role in the response
-        return ResponseEntity.ok(response);
-
-    } catch (BadCredentialsException e) {
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+            );
+    
+            // Update last login time
+            User user = userRepository.findByUsername(request.getUsername()); // Use username
+            if (user != null) {
+                user.setLastLogin(LocalDateTime.now());
+                userRepository.save(user);
+            }
+    
+            String token = jwtUtil.generateToken((UserDetails) authentication.getPrincipal());
+            Map<String, String> response = new HashMap<>();
+            response.put("token", token);
+            response.put("username", authentication.getName());
+            response.put("role", user.getRole().name());
+            return ResponseEntity.ok(response);
+        } catch (BadCredentialsException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                 .body(Map.of("error", "Invalid username or password"));
-    } catch (Exception e) {
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(Map.of("error", "Authentication failed: " + e.getMessage()));
+        }
     }
-}
 }

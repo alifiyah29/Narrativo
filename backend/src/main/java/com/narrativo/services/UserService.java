@@ -28,4 +28,15 @@ public class UserService {
     public Optional<User> findByUsername(String username) {
         return Optional.ofNullable(userRepository.findByUsername(username));
     }    
+
+    public void createInitialAdmin() {
+        if (userRepository.count() == 0) { // Only create admin if no users exist
+            User admin = new User();
+            admin.setUsername("admin");
+            admin.setEmail("admin@narrativo.com");
+            admin.setPassword(passwordEncoder.encode("admin123")); // Set a strong default password
+            admin.setRole(User.Role.ADMIN);
+            userRepository.save(admin);
+        }
+    } 
 }
