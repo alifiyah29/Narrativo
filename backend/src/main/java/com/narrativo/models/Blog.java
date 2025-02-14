@@ -31,6 +31,9 @@ public class Blog {
     @Column(nullable = false)
     private LocalDateTime updatedAt = LocalDateTime.now();
 
+    @Column(nullable = false)
+    private boolean deleted = false; // Soft delete flag
+
     @Enumerated(EnumType.STRING)
     private Visibility visibility;
 

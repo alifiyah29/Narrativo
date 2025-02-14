@@ -12,7 +12,6 @@ import { MatListModule } from '@angular/material/list';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatButtonModule } from '@angular/material/button';
 import { NgxChartsModule } from '@swimlane/ngx-charts';
-
 import { AnalyticsService } from '../../services/analytics/analytics.service';
 import { AuthService } from '../../services/auth/auth.service';
 import {
@@ -35,7 +34,7 @@ import { MatToolbar } from '@angular/material/toolbar';
     MatListModule,
     MatProgressSpinnerModule,
     MatButtonModule,
-    NgxChartsModule, // Add NgxChartsModule
+    NgxChartsModule,
     MatToolbar,
   ],
   templateUrl: './dashboard.component.html',
@@ -46,8 +45,6 @@ export class DashboardComponent implements OnInit {
   adminAnalytics: AdminAnalytics | null = null;
   isAdmin = false;
   errorMessage: string | null = null;
-
-  // Chart data
   monthlyBlogTrends: any[] = [];
 
   private analyticsService = inject(AnalyticsService);
@@ -93,7 +90,10 @@ export class DashboardComponent implements OnInit {
   private loadMonthlyBlogTrends(): void {
     this.analyticsService.getMonthlyBlogTrends().subscribe({
       next: (data) => {
-        this.monthlyBlogTrends = data;
+        this.monthlyBlogTrends = data.map((trend: any) => ({
+          name: trend.month,
+          value: trend.count,
+        }));
       },
       error: (error) => {
         console.error('Failed to load monthly blog trends:', error);

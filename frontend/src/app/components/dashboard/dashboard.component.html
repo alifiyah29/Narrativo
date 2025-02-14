@@ -17,7 +17,7 @@
 
   <div class="main-content">
     <!-- User Stats -->
-    <div *ngIf="userAnalytics" class="stats-section">
+    <div *ngIf="userAnalytics; else loading" class="stats-section">
       <div class="stats-grid">
         <mat-card class="stat-card">
           <mat-card-content>
@@ -133,9 +133,12 @@
     </div>
 
     <!-- Loading State -->
-    <mat-spinner *ngIf="!userAnalytics" class="loading-spinner"></mat-spinner>
+    <ng-template #loading>
+      <mat-spinner class="loading-spinner"></mat-spinner>
+    </ng-template>
   </div>
 
+  <!-- Chart Section -->
   <div *ngIf="isAdmin && monthlyBlogTrends.length > 0" class="chart-section">
     <h2 class="section-title">Monthly Blog Trends</h2>
     <ngx-charts-bar-vertical
