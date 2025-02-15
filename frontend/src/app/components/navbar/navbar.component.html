@@ -1,0 +1,27 @@
+<mat-toolbar color="primary" class="toolbar">
+    <!-- Left Section: Username and Dashboard Link -->
+    <div class="toolbar-left">
+      <span (click)="goToDashboard()" class="username">{{ username || 'Guest' }}</span>
+    </div>
+  
+    <!-- Right Section: Buttons -->
+    <div class="toolbar-right">
+      <!-- Go to Blogs Button (Only on Dashboard) -->
+      <button *ngIf="isDashboard" mat-raised-button color="accent" (click)="goToBlogs()">
+        <mat-icon>article</mat-icon>
+        Go to Blogs
+      </button>
+  
+      <!-- Create Blog Button (Only on Blogs Page) -->
+      <button *ngIf="isBlogsPage" mat-raised-button color="accent" (click)="createBlog()">
+        <mat-icon>add</mat-icon>
+        Create Blog
+      </button>
+  
+      <!-- Logout Button -->
+      <button mat-raised-button color="warn" (click)="logout()" class="ml-4">
+        <mat-icon>logout</mat-icon>
+        Logout
+      </button>
+    </div>
+  </mat-toolbar>

@@ -1,35 +1,5 @@
 <div class="blog-container">
-  <mat-toolbar color="primary" class="toolbar">
-    <div class="toolbar-left">
-      <span>{{ username || "Guest" }}'s Blogs</span>
-    </div>
-    <div class="toolbar-right">
-      <button mat-raised-button color="accent" routerLink="/blogs/new">
-        <mat-icon>add</mat-icon>
-        Create Blog
-      </button>
-      <button mat-icon-button [matMenuTriggerFor]="filterMenu" class="ml-4">
-        <mat-icon>filter_list</mat-icon>
-      </button>
-      <mat-menu #filterMenu="matMenu">
-        <button mat-menu-item (click)="onVisibilityFilterChange('ALL')">
-          All Blogs
-        </button>
-        <button
-          mat-menu-item
-          (click)="onVisibilityFilterChange(Visibility.PUBLIC)"
-        >
-          Public Blogs
-        </button>
-        <button
-          mat-menu-item
-          (click)="onVisibilityFilterChange(Visibility.PRIVATE)"
-        >
-          Private Blogs
-        </button>
-      </mat-menu>
-    </div>
-  </mat-toolbar>
+  <app-navbar></app-navbar>
 
   <div class="main-content">
     <mat-spinner *ngIf="isLoading" class="loading-spinner"></mat-spinner>

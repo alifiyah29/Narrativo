@@ -19,13 +19,13 @@ import {
   AdminAnalytics,
 } from '../../models/analytics/analytics.model';
 import { MatToolbar } from '@angular/material/toolbar';
+import { NavbarComponent } from '../navbar/navbar.component';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
   imports: [
     CommonModule,
-    RouterLink,
     MatCardModule,
     MatCardContent,
     MatCardHeader,
@@ -35,7 +35,7 @@ import { MatToolbar } from '@angular/material/toolbar';
     MatProgressSpinnerModule,
     MatButtonModule,
     NgxChartsModule,
-    MatToolbar,
+    NavbarComponent
   ],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css'],
@@ -107,10 +107,5 @@ export class DashboardComponent implements OnInit {
       this.router.navigate(['/login']);
     }
     this.errorMessage = 'Failed to load dashboard data';
-  }
-
-  logout(): void {
-    this.authService.logout();
-    this.router.navigate(['/login']);
   }
 }

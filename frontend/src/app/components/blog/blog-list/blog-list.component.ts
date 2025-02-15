@@ -10,6 +10,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { BlogService } from '../../../services/blog/blog.service';
 import { AuthService } from '../../../services/auth/auth.service';
 import { Blog, Visibility } from '../../../models/blog/blog.model';
+import { NavbarComponent } from '../../navbar/navbar.component';
 
 @Component({
   selector: 'app-blog-list',
@@ -22,6 +23,7 @@ import { Blog, Visibility } from '../../../models/blog/blog.model';
     MatMenuModule,
     MatToolbarModule,
     MatProgressSpinnerModule,
+    NavbarComponent,
   ],
   templateUrl: './blog-list.component.html',
   styleUrls: ['./blog-list.component.css'],
@@ -63,11 +65,6 @@ export class BlogListComponent implements OnInit {
         this.isLoading = false;
       },
     });
-  }
-
-  onVisibilityFilterChange(visibility: Visibility | 'ALL') {
-    this.currentVisibilityFilter = visibility;
-    this.loadBlogs();
   }
 
   deleteBlog(id: number) {

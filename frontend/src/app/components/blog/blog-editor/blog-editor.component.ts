@@ -8,11 +8,12 @@ import {
 } from '@angular/forms';
 import { BlogService } from '../../../services/blog/blog.service';
 import { ActivatedRoute, Router } from '@angular/router';
+import { NavbarComponent } from '../../navbar/navbar.component';
 
 @Component({
   selector: 'app-blog-editor',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, NavbarComponent],
   templateUrl: './blog-editor.component.html',
 })
 export class BlogEditorComponent implements OnInit {

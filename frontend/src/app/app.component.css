@@ -8,3 +8,7 @@ body {
 button {
   cursor: pointer;
 }
+
+.main {
+  padding: 20px;
+}
