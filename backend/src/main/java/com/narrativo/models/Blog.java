@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 @Data
 @Entity
 public class Blog {
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -31,13 +31,13 @@ public class Blog {
     @Column(nullable = false)
     private LocalDateTime updatedAt = LocalDateTime.now();
 
-    @Column(nullable = false)
-    private boolean deleted = false; // Soft delete flag
-
     @Enumerated(EnumType.STRING)
     private Visibility visibility;
 
+    @Column(nullable = false)
+    private Boolean deleted = false;
+
     public enum Visibility {
-        PUBLIC, PRIVATE
+        PUBLIC, PRIVATE, FRIENDS_ONLY
     }
 }

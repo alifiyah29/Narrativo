@@ -74,6 +74,36 @@ public class BlogController {
         }
     }
 
+    //Update blog visibility
+    @PutMapping("/{id}/visibility")
+    public ResponseEntity<?> updateBlogVisibility(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @PathVariable Long id,
+            @RequestParam Blog.Visibility visibility) {
+
+        Optional<Blog> existingBlog = blogService.getBlogById(id);
+        if (existingBlog.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(createMessage("Blog not found with id: " + id));
+        }
+
+        Blog blog = existingBlog.get();
+        if (!blog.getAuthor().getUsername().equals(userDetails.getUsername())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(createMessage("You don't have permission to update this blog"));
+        }
+
+        try {
+            blog.setVisibility(visibility);
+            blog.setUpdatedAt(LocalDateTime.now());
+            Blog savedBlog = blogService.updateBlog(blog);
+            return ResponseEntity.ok(savedBlog);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(createMessage("Error updating blog visibility: " + e.getMessage()));
+        }
+    }
+
     
     //increment the views of a blog
     @PutMapping("/{id}/view")

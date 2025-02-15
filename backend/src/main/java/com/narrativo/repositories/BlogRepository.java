@@ -8,7 +8,8 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.List;
 
 public interface BlogRepository extends JpaRepository<Blog, Long> {
-    List<Blog> findByAuthorId(Long authorId); 
+
+    List<Blog> findByAuthorId(Long authorId);
     List<Blog> findByVisibility(Visibility visibility);
 
     @Query("SELECT COUNT(b) FROM Blog b WHERE b.author.username = :username")

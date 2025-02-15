@@ -72,10 +72,11 @@ export class BlogEditorComponent implements OnInit {
         : this.blogService.createBlog(blogData);
 
       request$.subscribe({
-        next: () => {
-          this.router.navigate(['/blogs']);
+        next: () => this.router.navigate(['/blogs']),
+        error: (error) => {
+          console.error('Error saving blog:', error);
+          alert('Failed to save blog. Check the backend logs.');
         },
-        error: (error) => console.error('Error saving blog:', error),
       });
     }
   }
