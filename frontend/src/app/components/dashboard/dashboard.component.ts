@@ -35,7 +35,7 @@ import { NavbarComponent } from '../navbar/navbar.component';
     MatProgressSpinnerModule,
     MatButtonModule,
     NgxChartsModule,
-    NavbarComponent
+    NavbarComponent,
   ],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css'],
@@ -85,6 +85,10 @@ export class DashboardComponent implements OnInit {
         this.errorMessage = 'Failed to load admin statistics';
       },
     });
+  }
+
+  goToBlogs(): void {
+    this.router.navigate(['/blogs']);
   }
 
   private loadMonthlyBlogTrends(): void {

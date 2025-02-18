@@ -16,6 +16,7 @@ import { NavbarComponent } from '../../navbar/navbar.component';
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, NavbarComponent],
   templateUrl: './blog-editor.component.html',
+  styleUrls: ['./blog-editor.component.css'],
 })
 export class BlogEditorComponent implements OnInit {
   blogForm: FormGroup;
@@ -80,6 +81,10 @@ export class BlogEditorComponent implements OnInit {
         },
       });
     }
+  }
+
+  goToBlogs(): void {
+    this.router.navigate(['/blogs']);
   }
 
   navigateToDashboard() {

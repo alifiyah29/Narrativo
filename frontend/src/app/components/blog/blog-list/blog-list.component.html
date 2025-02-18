@@ -1,5 +1,17 @@
 <div class="blog-container">
-  <app-navbar></app-navbar>
+  <app-navbar>
+    <button (click)="onVisibilityFilterChange('ALL')">All</button>
+    <button (click)="onVisibilityFilterChange(Visibility.PUBLIC)">
+      Public
+    </button>
+    <button (click)="onVisibilityFilterChange(Visibility.PRIVATE)">
+      Private
+    </button>
+    <button (click)="onVisibilityFilterChange(Visibility.FRIENDS_ONLY)">
+      Friends Only
+    </button>
+    <button (click)="createBlog()">Create Blog</button>
+  </app-navbar>
 
   <div class="main-content">
     <mat-spinner *ngIf="isLoading" class="loading-spinner"></mat-spinner>
