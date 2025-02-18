@@ -1,63 +1,52 @@
-<div class="min-h-screen flex items-center justify-center bg-gray-100">
-  <div class="max-w-md w-full bg-white shadow-lg rounded-lg p-8">
-    <div class="text-center">
-      <h2 class="text-2xl font-bold text-gray-900">Welcome Back</h2>
-      <p class="mt-2 text-sm text-gray-600">Sign in to your account</p>
-    </div>
-    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="space-y-6 mt-6">
-      <div>
-        <label for="username" class="block text-sm font-medium text-gray-700">Username</label>
-        <input
-          id="username"
-          type="text"
-          formControlName="username"
-          class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-          placeholder="Enter your username"
-        />
-        <div
-          *ngIf="loginForm.get('username')?.invalid && loginForm.get('username')?.touched"
-          class="mt-1 text-sm text-red-600"
-        >
-          Username is required.
-        </div>
+<div class="login-container">
+  <div class="login-left">
+    <h2>Login! 👋</h2>
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+      <label for="username">Username</label>
+      <input
+        id="username"
+        type="text"
+        formControlName="username"
+        placeholder="Enter your username"
+      />
+      <div
+        *ngIf="
+          loginForm.get('username')?.invalid &&
+          loginForm.get('username')?.touched
+        "
+        class="error"
+      >
+        Username is required.
       </div>
-      <div>
-        <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
-        <input
-          id="password"
-          type="password"
-          formControlName="password"
-          class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-          placeholder="Enter your password"
-        />
-        <div
-          *ngIf="loginForm.get('password')?.invalid && loginForm.get('password')?.touched"
-          class="mt-1 text-sm text-red-600"
-        >
-          Password is required.
-        </div>
+      <label for="password">Password</label>
+      <input
+        id="password"
+        type="password"
+        formControlName="password"
+        placeholder="Enter your password"
+      />
+      <div
+        *ngIf="
+          loginForm.get('password')?.invalid &&
+          loginForm.get('password')?.touched
+        "
+        class="error"
+      >
+        Password is required.
       </div>
-      <div class="text-sm text-right">
-        <a href="#" class="text-indigo-600 hover:text-indigo-500">Forgot your password?</a>
-      </div>
-      <div>
-        <button
-          type="submit"
-          [disabled]="loginForm.invalid"
-          class="w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
-        >
-          Sign In
-        </button>
-      </div>
+      <button
+        type="submit"
+        [disabled]="loginForm.invalid"
+        class="btn btn-signin"
+      >
+        Sign In
+      </button>
     </form>
-    <div class="text-center mt-6">
-      <p class="text-sm text-gray-600">
-        Don't have an account?
-        <a routerLink="/register" class="text-indigo-600 hover:text-indigo-500">Register</a>
-      </p>
-    </div>
-    <div *ngIf="errorMessage" class="text-center text-sm text-red-600 mt-4">
-      {{ errorMessage }}
+    <p>Don't have an account? <a routerLink="/register">Sign Up Now</a></p>
+  </div>
+  <div class="login-right">
+    <div class="login-info">
+      <img src="hero.jpg" alt="Dashboard example" />
     </div>
   </div>
 </div>
