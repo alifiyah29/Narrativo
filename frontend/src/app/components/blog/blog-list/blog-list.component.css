@@ -44,3 +44,10 @@ body, html {
   height: 100%;
   overflow: hidden;
 }
+
+/* Additional styles for the filter button */
+.filter-button {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}

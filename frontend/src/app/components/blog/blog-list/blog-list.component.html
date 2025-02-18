@@ -1,16 +1,22 @@
 <div class="blog-container">
   <app-navbar>
-    <button (click)="onVisibilityFilterChange('ALL')">All</button>
-    <button (click)="onVisibilityFilterChange(Visibility.PUBLIC)">
-      Public
-    </button>
-    <button (click)="onVisibilityFilterChange(Visibility.PRIVATE)">
-      Private
-    </button>
-    <button (click)="onVisibilityFilterChange(Visibility.FRIENDS_ONLY)">
-      Friends Only
-    </button>
-    <button (click)="createBlog()">Create Blog</button>
+    <div class="toolbar">
+      <div class="toolbar-left">
+        <button mat-button (click)="createBlog()">Create Blog</button>
+      </div>
+      <div class="toolbar-right">
+        <!-- Filter Button with Dropdown Menu -->
+        <button mat-button [matMenuTriggerFor]="filterMenu">
+          <mat-icon>filter_list</mat-icon> Filter
+        </button>
+        <mat-menu #filterMenu="matMenu">
+          <button mat-menu-item (click)="onVisibilityFilterChange('ALL')">All</button>
+          <button mat-menu-item (click)="onVisibilityFilterChange(Visibility.PUBLIC)">Public</button>
+          <button mat-menu-item (click)="onVisibilityFilterChange(Visibility.PRIVATE)">Private</button>
+          <button mat-menu-item (click)="onVisibilityFilterChange(Visibility.FRIENDS_ONLY)">Friends Only</button>
+        </mat-menu>
+      </div>
+    </div>
   </app-navbar>
 
   <div class="main-content">
