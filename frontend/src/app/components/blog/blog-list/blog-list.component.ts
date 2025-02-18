@@ -48,14 +48,26 @@ export class BlogListComponent implements OnInit {
     this.loadBlogs();
   }
 
+  onVisibilityFilterChange(visibility: Visibility | 'ALL') {
+    this.currentVisibilityFilter = visibility;
+    this.blogs = []; // Clear current blogs to prevent old data display
+    this.isLoading = true; // Show loading state
+    this.loadBlogs(); // Fetch updated blogs
+  }
+
   loadBlogs() {
     this.isLoading = true;
-    const request =
-      this.currentVisibilityFilter === 'ALL'
-        ? this.blogService.getAllBlogs()
-        : this.blogService.getBlogsByVisibility(this.currentVisibilityFilter);
+    let request$;
 
-    request.subscribe({
+    if (this.currentVisibilityFilter === 'ALL') {
+      request$ = this.blogService.getAllBlogs();
+    } else {
+      request$ = this.blogService.getBlogsByVisibility(
+        this.currentVisibilityFilter
+      );
+    }
+
+    request$.subscribe({
       next: (blogs) => {
         this.blogs = blogs;
         this.isLoading = false;

@@ -1,13 +1,16 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth/auth.service';
+import { BlogService } from '../../services/blog/blog.service';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatIcon } from '@angular/material/icon';
+import { MatMenuModule } from '@angular/material/menu';
 import { NgIf } from '@angular/common';
 
 @Component({
   selector: 'app-navbar',
-  imports: [MatToolbarModule, MatIcon, NgIf],
+  standalone: true,
+  imports: [MatToolbarModule, MatIcon, MatMenuModule, NgIf],
   templateUrl: './navbar.component.html',
   styleUrls: ['./navbar.component.css'],
 })
@@ -16,7 +19,11 @@ export class NavbarComponent implements OnInit {
   isDashboard: boolean = false;
   isBlogsPage: boolean = false;
 
-  constructor(private authService: AuthService, private router: Router) {}
+  constructor(
+    private authService: AuthService,
+    private blogService: BlogService,
+    private router: Router
+  ) {}
 
   ngOnInit(): void {
     // Get the current user's username
@@ -41,6 +48,11 @@ export class NavbarComponent implements OnInit {
   // Navigate to the create blog page
   createBlog(): void {
     this.router.navigate(['/blogs/new']);
+  }
+
+  // Handle blog visibility filtering
+  onVisibilityFilterChange(visibility: string): void {
+    this.blogService.setVisibilityFilter(visibility);
   }
 
   // Logout the user

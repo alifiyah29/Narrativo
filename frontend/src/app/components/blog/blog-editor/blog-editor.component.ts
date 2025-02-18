@@ -8,6 +8,7 @@ import {
 } from '@angular/forms';
 import { BlogService } from '../../../services/blog/blog.service';
 import { ActivatedRoute, Router } from '@angular/router';
+import { AuthService } from '../../../services/auth/auth.service';
 import { NavbarComponent } from '../../navbar/navbar.component';
 
 @Component({
@@ -20,8 +21,10 @@ export class BlogEditorComponent implements OnInit {
   blogForm: FormGroup;
   isEditing = false;
   blogId?: number;
+  username: string = '';
 
   constructor(
+    private authService: AuthService,
     private fb: FormBuilder,
     private blogService: BlogService,
     private router: Router,
@@ -35,7 +38,8 @@ export class BlogEditorComponent implements OnInit {
   }
 
   ngOnInit() {
-    // Check if we're editing an existing blog
+    const currentUser = this.authService.getCurrentUser();
+    this.username = currentUser ? currentUser.username : 'Guest';
     this.blogId = Number(this.route.snapshot.paramMap.get('id'));
     if (this.blogId) {
       this.isEditing = true;
@@ -47,7 +51,6 @@ export class BlogEditorComponent implements OnInit {
     if (this.blogId) {
       this.blogService.getBlogById(this.blogId).subscribe({
         next: (blog) => {
-          // Populate the form with the blog data
           this.blogForm.patchValue({
             title: blog.title,
             content: blog.content,
@@ -55,10 +58,8 @@ export class BlogEditorComponent implements OnInit {
           });
         },
         error: (error) => {
-          // Log the error with details
           console.error('Error loading blog:', error);
-          console.error('Error status:', error.status); // HTTP status
-          console.error('Error message:', error.message); // Error message
+          alert('Failed to load blog. Check the backend logs.');
         },
       });
     }
@@ -67,7 +68,6 @@ export class BlogEditorComponent implements OnInit {
   onSubmit() {
     if (this.blogForm.valid) {
       const blogData = this.blogForm.value;
-
       const request$ = this.isEditing
         ? this.blogService.updateBlog(this.blogId!, blogData)
         : this.blogService.createBlog(blogData);
@@ -80,5 +80,14 @@ export class BlogEditorComponent implements OnInit {
         },
       });
     }
+  }
+
+  navigateToDashboard() {
+    this.router.navigate(['/dashboard']);
+  }
+
+  logout() {
+    this.authService.logout();
+    this.router.navigate(['/login']);
   }
 }

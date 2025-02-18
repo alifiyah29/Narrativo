@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { BehaviorSubject, Observable, switchMap } from 'rxjs';
 import { Blog } from '../../models/blog/blog.model';
 
 @Injectable({
@@ -8,6 +8,7 @@ import { Blog } from '../../models/blog/blog.model';
 })
 export class BlogService {
   private readonly API_URL = 'http://localhost:8080/api/blogs';
+  private visibilityFilter = new BehaviorSubject<string>('ALL');
 
   constructor(private http: HttpClient) {}
 
@@ -20,6 +21,24 @@ export class BlogService {
       Authorization: `Bearer ${token}`, // Include JWT token
       'Content-Type': 'application/json', // Ensure JSON content type
     });
+  }
+
+  // Set the global blog visibility filter
+  setVisibilityFilter(visibility: string): void {
+    this.visibilityFilter.next(visibility);
+  }
+
+  // Get blogs based on the selected filter
+  getFilteredBlogs(): Observable<Blog[]> {
+    return this.visibilityFilter.asObservable().pipe(
+      switchMap((filter) =>
+        filter === 'ALL'
+          ? this.http.get<Blog[]>(this.API_URL, { headers: this.getHeaders() })
+          : this.http.get<Blog[]>(`${this.API_URL}/visibility/${filter}`, {
+              headers: this.getHeaders(),
+            })
+      )
+    );
   }
 
   createBlog(blog: Partial<Blog>): Observable<Blog> {
