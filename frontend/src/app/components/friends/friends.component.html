@@ -1,0 +1,14 @@
+<h1>Friends</h1>
+<div *ngFor="let friend of friends">
+    <p>{{ friend.username }}</p>
+</div>
+
+<h2>Friend Requests</h2>
+<div *ngFor="let request of friendRequests">
+    <p>{{ request.sender.username }} wants to be your friend</p>
+    <button (click)="acceptRequest(request.id)">Accept</button>
+    <button (click)="rejectRequest(request.id)">Reject</button>
+</div>
+
+<input [(ngModel)]="searchUsername" placeholder="Search for users" />
+<button (click)="sendRequest(searchUsername)">Send Friend Request</button>

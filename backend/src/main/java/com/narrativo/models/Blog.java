@@ -32,7 +32,7 @@ public class Blog {
     private LocalDateTime updatedAt = LocalDateTime.now();
 
     @Enumerated(EnumType.STRING)
-    private Visibility visibility;
+    private Visibility visibility = Visibility.PUBLIC;
 
     @Column(nullable = false)
     private Boolean deleted = false;

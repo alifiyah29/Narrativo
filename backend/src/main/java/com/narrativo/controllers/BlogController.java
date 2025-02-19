@@ -65,9 +65,11 @@ public class BlogController {
 
     // Get blogs by visibility
     @GetMapping("/visibility/{visibility}")
-    public ResponseEntity<List<Blog>> getBlogsByVisibility(@PathVariable Blog.Visibility visibility) {
+    public ResponseEntity<List<Blog>> getBlogsByVisibility(
+        @PathVariable Blog.Visibility visibility,
+        @AuthenticationPrincipal UserDetails userDetails) {
         try {
-            List<Blog> blogs = blogService.getBlogsByVisibility(visibility);
+            List<Blog> blogs = blogService.getBlogsByVisibility(visibility, userDetails.getUsername());
             return ResponseEntity.ok(blogs);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();

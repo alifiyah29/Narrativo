@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -48,8 +49,16 @@ public class BlogServiceImpl implements BlogService {
     }
 
     @Override
-    public List<Blog> getBlogsByVisibility(Blog.Visibility visibility) {
-        return blogRepository.findByVisibility(visibility);
+    public List<Blog> getBlogsByVisibility(Blog.Visibility visibility, String username) {
+        User user = userRepository.findByUsername(username);
+        List<User> friends = userRepository.findByFriendsContaining(user);
+    
+        return blogRepository.findAll().stream()
+            .filter(blog -> blog.getVisibility() == Blog.Visibility.PUBLIC
+                    || (blog.getVisibility() == Blog.Visibility.FRIENDS_ONLY && friends.contains(blog.getAuthor()))
+                    || (blog.getVisibility() == Blog.Visibility.PRIVATE && blog.getAuthor().equals(user))
+                    || user.getRole() == User.Role.ADMIN)
+            .collect(Collectors.toList());
     }
 
     @Override

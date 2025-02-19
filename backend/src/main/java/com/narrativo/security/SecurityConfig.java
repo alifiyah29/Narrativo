@@ -50,6 +50,7 @@ public class SecurityConfig {
             .requestMatchers("/api/analytics/**").authenticated() // Secure analytics APIs
             .requestMatchers("/api/analytics/user").hasAnyRole("USER", "ADMIN")  // Allow both USER & ADMIN
             .requestMatchers("/api/analytics/admin").hasRole("ADMIN")  // Only ADMIN can access this
+            .requestMatchers("/api/friends").authenticated()
             .anyRequest().authenticated()
             )
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

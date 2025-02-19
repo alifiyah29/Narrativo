@@ -1,6 +1,5 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './guards/auth/auth.guard';
-import { NavbarComponent } from './components/navbar/navbar.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
@@ -48,6 +47,13 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./components/blog/blog-editor/blog-editor.component').then(
             (m) => m.BlogEditorComponent
+          ),
+      },
+      {
+        path: 'friends',
+        loadComponent: () =>
+          import('./components/friends/friends.component').then(
+            (m) => m.FriendsComponent
           ),
       },
     ],
