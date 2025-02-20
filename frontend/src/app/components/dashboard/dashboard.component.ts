@@ -91,6 +91,9 @@ export class DashboardComponent implements OnInit {
     this.router.navigate(['/blogs']);
   }
 
+  goToFriends(): void {
+    this.router.navigate(['/friends']);
+  }
   private loadMonthlyBlogTrends(): void {
     this.analyticsService.getMonthlyBlogTrends().subscribe({
       next: (data) => {

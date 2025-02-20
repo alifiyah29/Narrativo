@@ -26,6 +26,13 @@ export const routes: Routes = [
     canActivate: [authGuard],
   },
   {
+    path: 'friends',
+    loadComponent: () =>
+      import('./components/friends/friends.component').then(
+        (m) => m.FriendsComponent
+      ),
+  },
+  {
     path: 'blogs',
     children: [
       {
@@ -47,13 +54,6 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./components/blog/blog-editor/blog-editor.component').then(
             (m) => m.BlogEditorComponent
-          ),
-      },
-      {
-        path: 'friends',
-        loadComponent: () =>
-          import('./components/friends/friends.component').then(
-            (m) => m.FriendsComponent
           ),
       },
     ],

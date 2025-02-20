@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 @Injectable({
@@ -9,6 +9,14 @@ export class FriendService {
   private apiUrl = 'http://localhost:8080/api/friends';
 
   constructor(private http: HttpClient) {}
+
+  private getAuthHeaders(): HttpHeaders {
+    const token = localStorage.getItem('token'); // Get JWT from storage
+    return new HttpHeaders({
+      Authorization: `Bearer ${token}`, // Attach token to header
+      'Content-Type': 'application/json',
+    });
+  }
 
   getFriends(): Observable<any> {
     return this.http.get(`${this.apiUrl}`);
