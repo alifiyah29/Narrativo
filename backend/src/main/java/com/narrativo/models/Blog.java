@@ -1,5 +1,6 @@
 package com.narrativo.models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.Data;
 import java.time.LocalDateTime;
@@ -23,6 +24,7 @@ public class Blog {
 
     @ManyToOne
     @JoinColumn(name = "author_id", nullable = false)
+    @JsonBackReference // Prevents infinite recursion
     private User author;
 
     @Column(nullable = false, updatable = false)

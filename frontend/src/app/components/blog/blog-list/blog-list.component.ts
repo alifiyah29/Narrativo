@@ -13,6 +13,7 @@ import { Router } from '@angular/router';
 
 import { BlogService } from '../../../services/blog/blog.service';
 import { AuthService } from '../../../services/auth/auth.service';
+import { FriendService } from '../../../services/friends/friends.service'; // Import FriendService
 import { Blog, Visibility } from '../../../models/blog/blog.model';
 import { NavbarComponent } from '../../navbar/navbar.component';
 
@@ -37,12 +38,15 @@ export class BlogListComponent implements OnInit, OnDestroy {
   currentVisibilityFilter: Visibility | 'ALL' = 'ALL';
   isLoading: boolean = true;
   username: string = '';
+  isAdmin: boolean = false; // Add isAdmin property
+  friends: string[] = []; // Add friends property
   Visibility = Visibility; // Expose the enum to the template
   private destroy$ = new Subject<void>();
 
   constructor(
     private blogService: BlogService,
     private authService: AuthService,
+    private friendService: FriendService, // Inject FriendService
     private snackBar: MatSnackBar,
     private router: Router
   ) {}
@@ -60,6 +64,20 @@ export class BlogListComponent implements OnInit, OnDestroy {
   private initializeComponent(): void {
     const currentUser = this.authService.getCurrentUser();
     this.username = currentUser?.username || 'Guest';
+    this.isAdmin = currentUser?.role === 'ADMIN'; // Set isAdmin based on user role
+
+    // Load friends for the current user
+    this.friendService.getFriends().subscribe({
+      next: (friends) => {
+        this.friends = friends.map(
+          (friend: { username: string }) => friend.username
+        ); // Explicitly type the `friend` parameter
+      },
+      error: (error) => {
+        console.error('Error loading friends:', error);
+      },
+    });
+
     this.loadBlogs();
   }
 
@@ -84,7 +102,23 @@ export class BlogListComponent implements OnInit, OnDestroy {
         : this.blogService.getBlogsByVisibility(this.currentVisibilityFilter);
 
     request.pipe(takeUntil(this.destroy$)).subscribe({
-      next: () => (this.isLoading = false),
+      next: (blogs) => {
+        this.blogs = blogs.filter((blog) => {
+          if (blog.visibility === 'PUBLIC') {
+            return true; // Everyone can view public blogs
+          } else if (blog.visibility === 'PRIVATE') {
+            return blog.author.username === this.username || this.isAdmin; // Only the author or admin can view private blogs
+          } else if (blog.visibility === 'FRIENDS_ONLY') {
+            return (
+              this.friends.includes(blog.author.username) ||
+              blog.author.username === this.username ||
+              this.isAdmin
+            ); // Only friends, author, or admin can view friends-only blogs
+          }
+          return false;
+        });
+        this.isLoading = false;
+      },
       error: (error) => this.handleError('Error loading blogs', error),
     });
   }

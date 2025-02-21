@@ -54,10 +54,22 @@ public class BlogServiceImpl implements BlogService {
         List<User> friends = userRepository.findByFriendsContaining(user);
     
         return blogRepository.findAll().stream()
-            .filter(blog -> blog.getVisibility() == Blog.Visibility.PUBLIC
-                    || (blog.getVisibility() == Blog.Visibility.FRIENDS_ONLY && friends.contains(blog.getAuthor()))
-                    || (blog.getVisibility() == Blog.Visibility.PRIVATE && blog.getAuthor().equals(user))
-                    || user.getRole() == User.Role.ADMIN)
+            .filter(blog -> {
+                switch (blog.getVisibility()) {
+                    case PUBLIC:
+                        return true; // Everyone can view public blogs
+                    case PRIVATE:
+                        // Only the blog author and admin can view
+                        return blog.getAuthor().equals(user) || user.getRole() == User.Role.ADMIN;
+                    case FRIENDS_ONLY:
+                        // Visible to friends, author, and admin
+                        return blog.getAuthor().equals(user)
+                                || friends.contains(blog.getAuthor())
+                                || user.getRole() == User.Role.ADMIN;
+                    default:
+                        return false;
+                }
+            })
             .collect(Collectors.toList());
     }
 

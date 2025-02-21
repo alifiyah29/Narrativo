@@ -1,14 +1,14 @@
 package com.narrativo.models;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import jakarta.persistence.*;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
-
-import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
 @Entity
 @Data
@@ -23,7 +23,7 @@ public class User {
 
     private String username;
 
-    @Column(nullable = false, unique = true) // Ensure email is unique
+    @Column(nullable = false, unique = true)
     private String email;
 
     private String password;
@@ -37,7 +37,7 @@ public class User {
     }
 
     @Enumerated(EnumType.STRING)
-    private Role role = Role.USER; // Default role is USER
+    private Role role = Role.USER;
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
@@ -47,7 +47,10 @@ public class User {
     )
     private Set<User> friends = new HashSet<>();
 
-    // ✅ Proper equals and hashCode to prevent recursion
+    @OneToMany(mappedBy = "author", fetch = FetchType.LAZY)
+    @JsonManagedReference // Allows serialization of blogs
+    private Set<Blog> blogs = new HashSet<>();
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
