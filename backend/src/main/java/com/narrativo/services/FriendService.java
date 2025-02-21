@@ -27,19 +27,19 @@ public class FriendService {
     public void sendFriendRequest(String senderUsername, String receiverUsername) {
         User sender = userRepository.findByUsername(senderUsername);
         User receiver = userRepository.findByUsername(receiverUsername);
-    
+
         if (sender == null || receiver == null) {
             throw new RuntimeException("User not found");
         }
-    
+
         if (sender.equals(receiver)) {
             throw new RuntimeException("Cannot send friend request to yourself");
         }
-    
+
         if (friendRequestRepository.existsBySenderAndReceiverAndStatus(sender, receiver, FriendRequest.Status.PENDING)) {
             throw new RuntimeException("Friend request already sent");
         }
-    
+
         FriendRequest request = new FriendRequest();
         request.setSender(sender);
         request.setReceiver(receiver);
@@ -52,10 +52,8 @@ public class FriendService {
         requestOpt.ifPresent(request -> {
             request.setStatus(FriendRequest.Status.ACCEPTED);
             friendRequestRepository.save(request);
-
             request.getSender().getFriends().add(request.getReceiver());
             request.getReceiver().getFriends().add(request.getSender());
-
             userRepository.save(request.getSender());
             userRepository.save(request.getReceiver());
         });
@@ -64,5 +62,11 @@ public class FriendService {
     @Transactional
     public void rejectFriendRequest(Long requestId) {
         friendRequestRepository.deleteById(requestId);
+    }
+
+    // Fetch friend requests
+    public List<FriendRequest> getFriendRequests(String username) {
+        User user = userRepository.findByUsername(username);
+        return friendRequestRepository.findByReceiverAndStatus(user, FriendRequest.Status.PENDING);
     }
 }

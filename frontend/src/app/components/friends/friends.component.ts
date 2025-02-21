@@ -12,7 +12,7 @@ import { CommonModule } from '@angular/common';
 export class FriendsComponent implements OnInit {
   friends: any[] = [];
   friendRequests: any[] = [];
-  searchUsername: string = '';  // ✅ Add the searchUsername property
+  searchUsername: string = '';
 
   constructor(private friendService: FriendService) {}
 
@@ -22,35 +22,51 @@ export class FriendsComponent implements OnInit {
   }
 
   loadFriends() {
-    this.friendService.getFriends().subscribe((data) => {
-      this.friends = data;
+    this.friendService.getFriends().subscribe({
+      next: (data) => (this.friends = data),
+      error: (error) => console.error('Error loading friends:', error),
     });
   }
 
   loadFriendRequests() {
-    this.friendService.getFriendRequests().subscribe((data) => {
-      this.friendRequests = data;
+    this.friendService.getFriendRequests().subscribe({
+      next: (data) => (this.friendRequests = data),
+      error: (error) => console.error('Error loading friend requests:', error),
     });
   }
 
   sendRequest(username: string) {
-    this.friendService.sendFriendRequest(username).subscribe(() => {
-      alert('Friend request sent!');
+    if (!username) {
+      alert('Please enter a username.');
+      return;
+    }
+    this.friendService.sendFriendRequest(username).subscribe({
+      next: (response) => {
+        alert(response.message); // Display the message from the backend
+        this.loadFriendRequests();
+      },
+      error: (error) => console.error('Error sending friend request:', error),
     });
   }
 
   acceptRequest(requestId: number) {
-    this.friendService.acceptFriendRequest(requestId).subscribe(() => {
-      alert('Friend request accepted!');
-      this.loadFriendRequests();
-      this.loadFriends();
+    this.friendService.acceptFriendRequest(requestId).subscribe({
+      next: (response) => {
+        alert(response.message); // Display the message from the backend
+        this.loadFriendRequests();
+        this.loadFriends();
+      },
+      error: (error) => console.error('Error accepting friend request:', error),
     });
   }
 
   rejectRequest(requestId: number) {
-    this.friendService.rejectFriendRequest(requestId).subscribe(() => {
-      alert('Friend request rejected!');
-      this.loadFriendRequests();
+    this.friendService.rejectFriendRequest(requestId).subscribe({
+      next: (response) => {
+        alert(response.message); // Display the message from the backend
+        this.loadFriendRequests();
+      },
+      error: (error) => console.error('Error rejecting friend request:', error),
     });
   }
 }
