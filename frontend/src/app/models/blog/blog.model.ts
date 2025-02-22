@@ -2,8 +2,8 @@ export interface Blog {
   id: number;
   title: string;
   content: string;
-  visibility: Visibility; // Use enum
-  author: {
+  visibility: Visibility;
+  user: { 
     id: number;
     username: string;
   };
@@ -15,5 +15,5 @@ export interface Blog {
 export enum Visibility {
   PUBLIC = 'PUBLIC',
   PRIVATE = 'PRIVATE',
-  FRIENDS_ONLY = 'FRIENDS_ONLY', 
+  FRIENDS_ONLY = 'FRIENDS_ONLY',
 }

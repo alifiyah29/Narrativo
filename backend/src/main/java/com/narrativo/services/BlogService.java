@@ -7,7 +7,7 @@ import java.util.Optional;
 public interface BlogService {
     Blog createBlog(Blog blog, String username);
     List<Blog> getAllBlogs();
-    List<Blog> getBlogsByAuthor(Long authorId);
+    List<Blog> getBlogsByUser(Long userId);
     List<Blog> getBlogsByVisibility(Blog.Visibility visibility, String username);
     Optional<Blog> getBlogById(Long id);
     Blog updateBlog(Blog blog);

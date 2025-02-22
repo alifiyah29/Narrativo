@@ -23,9 +23,9 @@ public class Blog {
     private Integer views = 0;
 
     @ManyToOne
-    @JoinColumn(name = "author_id", nullable = false)
+    @JoinColumn(name = "user_id", nullable = false)
     @JsonBackReference // Prevents infinite recursion
-    private User author;
+    private User user; // This is the field referenced by 'mappedBy'
 
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt = LocalDateTime.now();

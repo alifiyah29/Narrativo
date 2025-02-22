@@ -26,8 +26,8 @@ public class AnalyticsServiceImpl implements AnalyticsService {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         Map<String, Object> stats = new HashMap<>();
 
-        stats.put("totalBlogs", blogRepository.countByAuthorUsername(username));
-        stats.put("totalViews", blogRepository.sumViewsByAuthor(username));
+        stats.put("totalBlogs", blogRepository.countByUserUsername(username));
+        stats.put("totalViews", blogRepository.sumViewsByUser(username));
 
         User user = userRepository.findByUsername(username);
         stats.put("lastLogin", user != null && user.getLastLogin() != null ? user.getLastLogin() : "Never");

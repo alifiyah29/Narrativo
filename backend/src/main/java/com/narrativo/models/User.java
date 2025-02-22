@@ -47,7 +47,7 @@ public class User {
     )
     private Set<User> friends = new HashSet<>();
 
-    @OneToMany(mappedBy = "author", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     @JsonManagedReference // Allows serialization of blogs
     private Set<Blog> blogs = new HashSet<>();
 

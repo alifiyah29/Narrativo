@@ -56,6 +56,7 @@ export class BlogEditorComponent implements OnInit {
             title: blog.title,
             content: blog.content,
             visibility: blog.visibility,
+            user: blog.user, 
           });
         },
         error: (error) => {

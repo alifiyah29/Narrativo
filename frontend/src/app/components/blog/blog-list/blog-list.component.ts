@@ -107,13 +107,13 @@ export class BlogListComponent implements OnInit, OnDestroy {
           if (blog.visibility === 'PUBLIC') {
             return true; // Everyone can view public blogs
           } else if (blog.visibility === 'PRIVATE') {
-            return blog.author.username === this.username || this.isAdmin; // Only the author or admin can view private blogs
+            return blog.user.username === this.username || this.isAdmin; 
           } else if (blog.visibility === 'FRIENDS_ONLY') {
             return (
-              this.friends.includes(blog.author.username) ||
-              blog.author.username === this.username ||
+              this.friends.includes(blog.user.username) ||
+              blog.user.username === this.username ||
               this.isAdmin
-            ); // Only friends, author, or admin can view friends-only blogs
+            ); 
           }
           return false;
         });

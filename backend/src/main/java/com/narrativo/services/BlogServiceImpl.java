@@ -4,11 +4,9 @@ import com.narrativo.models.Blog;
 import com.narrativo.models.User;
 import com.narrativo.repositories.BlogRepository;
 import com.narrativo.repositories.UserRepository;
-
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -23,48 +21,41 @@ public class BlogServiceImpl implements BlogService {
 
     @Override
     public Blog createBlog(Blog blog, String username) {
-        // Fetch user from the database
-        User author = userRepository.findByUsername(username);
-        if (author == null) {
+        User user = userRepository.findByUsername(username);
+        if (user == null) {
             throw new RuntimeException("User not found");
         }
-
-        // Set author and timestamps
-        blog.setAuthor(author);
+        blog.setUser(user); 
         blog.setCreatedAt(LocalDateTime.now());
         blog.setUpdatedAt(LocalDateTime.now());
-
         return blogRepository.save(blog);
     }
 
     @Override
     public List<Blog> getAllBlogs() {
-        System.out.println("Fetching all blogs..."); //Debugging
         return blogRepository.findAll();
     }
 
     @Override
-    public List<Blog> getBlogsByAuthor(Long authorId) {
-        return blogRepository.findByAuthorId(authorId);
+    public List<Blog> getBlogsByUser(Long userId) { 
+        return blogRepository.findByUserId(userId);
     }
 
     @Override
     public List<Blog> getBlogsByVisibility(Blog.Visibility visibility, String username) {
         User user = userRepository.findByUsername(username);
         List<User> friends = userRepository.findByFriendsContaining(user);
-    
+
         return blogRepository.findAll().stream()
             .filter(blog -> {
                 switch (blog.getVisibility()) {
                     case PUBLIC:
-                        return true; // Everyone can view public blogs
+                        return true;
                     case PRIVATE:
-                        // Only the blog author and admin can view
-                        return blog.getAuthor().equals(user) || user.getRole() == User.Role.ADMIN;
+                        return blog.getUser().equals(user) || user.getRole() == User.Role.ADMIN;
                     case FRIENDS_ONLY:
-                        // Visible to friends, author, and admin
-                        return blog.getAuthor().equals(user)
-                                || friends.contains(blog.getAuthor())
+                        return blog.getUser().equals(user)
+                                || friends.contains(blog.getUser())
                                 || user.getRole() == User.Role.ADMIN;
                     default:
                         return false;
@@ -87,23 +78,15 @@ public class BlogServiceImpl implements BlogService {
     @Override
     @Transactional
     public void deleteBlog(Long id) {
-        Optional<Blog> blog = blogRepository.findById(id);
-        if (blog.isPresent()) {
-            blogRepository.delete(blog.get());
-        } else {
-            throw new RuntimeException("Blog not found with id: " + id);
-        }
+        blogRepository.deleteById(id);
     }
 
+    @Override
     @Transactional
     public Blog incrementViews(Long id) {
-        Optional<Blog> blogOptional = blogRepository.findById(id);
-        if (blogOptional.isPresent()) {
-            Blog blog = blogOptional.get();
-            blog.setViews(blog.getViews() + 1); // Increment views
-            return blogRepository.save(blog);
-        } else {
-            throw new RuntimeException("Blog not found with id: " + id);
-        }
-    }    
+        Blog blog = blogRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("Blog not found with id: " + id));
+        blog.setViews(blog.getViews() + 1);
+        return blogRepository.save(blog);
+    }
 }
