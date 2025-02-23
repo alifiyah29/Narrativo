@@ -59,15 +59,25 @@ public class BlogController {
 
     @GetMapping("/visibility/{visibility}")
     public ResponseEntity<List<Blog>> getBlogsByVisibility(
-        @PathVariable Blog.Visibility visibility,
+        @PathVariable String visibility,
         @AuthenticationPrincipal UserDetails userDetails) {
-        try {
-            List<Blog> blogs = blogService.getBlogsByVisibility(visibility, userDetails.getUsername());
-            return ResponseEntity.ok(blogs);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+    
+        List<Blog> blogs;
+    
+        if ("ALL".equalsIgnoreCase(visibility)) {
+            blogs = blogService.getAllBlogs(); // Return all blogs
+        } else {
+            try {
+                Blog.Visibility enumVisibility = Blog.Visibility.valueOf(visibility.toUpperCase());
+                blogs = blogService.getBlogsByVisibility(enumVisibility, userDetails.getUsername());
+            } catch (IllegalArgumentException e) {
+                return ResponseEntity.badRequest().body(null); // Invalid visibility
+            }
         }
+    
+        return ResponseEntity.ok(blogs);
     }
+    
 
     @PutMapping("/{id}/visibility")
     public ResponseEntity<?> updateBlogVisibility(

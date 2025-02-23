@@ -1,6 +1,7 @@
 package com.narrativo.repositories;
 
 import com.narrativo.models.Blog;
+import com.narrativo.models.User;
 import com.narrativo.models.Blog.Visibility;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -22,4 +23,11 @@ public interface BlogRepository extends JpaRepository<Blog, Long> {
     Long sumAllViews();
 
     List<Blog> findTop5ByOrderByCreatedAtDesc();
+
+    @Query("SELECT b FROM Blog b WHERE b.visibility = :visibility OR " +
+       "(b.visibility = 'FRIENDS_ONLY' AND b.user IN :friends) OR " +
+       "(b.visibility = 'PRIVATE' AND b.user = :user) " +
+       "ORDER BY b.createdAt DESC")
+    List<Blog> findBlogsByVisibility(Blog.Visibility visibility, User user, List<User> friends);
+
 }

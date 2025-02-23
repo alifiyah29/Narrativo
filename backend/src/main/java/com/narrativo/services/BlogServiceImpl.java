@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -44,25 +43,13 @@ public class BlogServiceImpl implements BlogService {
     @Override
     public List<Blog> getBlogsByVisibility(Blog.Visibility visibility, String username) {
         User user = userRepository.findByUsername(username);
+        if (user == null) throw new RuntimeException("User not found");
+    
         List<User> friends = userRepository.findByFriendsContaining(user);
-
-        return blogRepository.findAll().stream()
-            .filter(blog -> {
-                switch (blog.getVisibility()) {
-                    case PUBLIC:
-                        return true;
-                    case PRIVATE:
-                        return blog.getUser().equals(user) || user.getRole() == User.Role.ADMIN;
-                    case FRIENDS_ONLY:
-                        return blog.getUser().equals(user)
-                                || friends.contains(blog.getUser())
-                                || user.getRole() == User.Role.ADMIN;
-                    default:
-                        return false;
-                }
-            })
-            .collect(Collectors.toList());
-    }
+    
+        // Fetch blogs directly from DB
+        return blogRepository.findBlogsByVisibility(visibility, user, friends);
+    }   
 
     @Override
     public Optional<Blog> getBlogById(Long id) {

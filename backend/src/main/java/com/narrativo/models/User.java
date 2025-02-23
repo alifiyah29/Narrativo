@@ -1,5 +1,6 @@
 package com.narrativo.models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Data;
@@ -45,7 +46,12 @@ public class User {
         joinColumns = @JoinColumn(name = "user_id"),
         inverseJoinColumns = @JoinColumn(name = "friend_id")
     )
+    @JsonManagedReference
     private Set<User> friends = new HashSet<>();
+
+    @ManyToMany(mappedBy = "friends", fetch = FetchType.LAZY)
+    @JsonBackReference
+    private Set<User> friendOf = new HashSet<>();
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     @JsonManagedReference // Allows serialization of blogs

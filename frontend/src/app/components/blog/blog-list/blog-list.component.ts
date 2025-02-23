@@ -96,31 +96,16 @@ export class BlogListComponent implements OnInit, OnDestroy {
 
   loadBlogs(): void {
     this.isLoading = true;
-    const request =
-      this.currentVisibilityFilter === 'ALL'
-        ? this.blogService.getAllBlogs()
-        : this.blogService.getBlogsByVisibility(this.currentVisibilityFilter);
-
-    request.pipe(takeUntil(this.destroy$)).subscribe({
-      next: (blogs) => {
-        this.blogs = blogs.filter((blog) => {
-          if (blog.visibility === 'PUBLIC') {
-            return true; // Everyone can view public blogs
-          } else if (blog.visibility === 'PRIVATE') {
-            return blog.user.username === this.username || this.isAdmin; 
-          } else if (blog.visibility === 'FRIENDS_ONLY') {
-            return (
-              this.friends.includes(blog.user.username) ||
-              blog.user.username === this.username ||
-              this.isAdmin
-            ); 
-          }
-          return false;
-        });
-        this.isLoading = false;
-      },
-      error: (error) => this.handleError('Error loading blogs', error),
-    });
+    this.blogService
+      .getBlogsByVisibility(this.currentVisibilityFilter)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (blogs) => {
+          this.blogs = blogs;
+          this.isLoading = false;
+        },
+        error: (error) => this.handleError('Error loading blogs', error),
+      });
   }
 
   onVisibilityFilterChange(visibility: Visibility | 'ALL'): void {
